@@ -1,12 +1,13 @@
 import json
 import re
+from io import StringIO
 
 def wapp_to_json(chat_location):
 
     pattern = "([1-9]|1[0-2])/([1-9]|[1-2][0-9]|3[0-1])/([1-9][1-9]), ([0-1][0-9]|2[0-3]):([0-5][0-9]) - "
 
-    with open(chat_location, "r", encoding = "utf-8") as f:
-        chat = f.readlines()
+    chat = StringIO(chat_location)
+    chat = chat.readlines()
 
     chat_json = []
     for i in chat:

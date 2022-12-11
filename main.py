@@ -2,16 +2,7 @@ from wapp_to_json import wapp_to_json
 import json
 import streamlit as st
 import pandas as pd
-
-st.title("WhatsApp Chat Analyzer")
-st.write("""
-
-WhatsApp Chat Analysis
-
-
-""")
-
-messages = json.loads(wapp_to_json("../wp_chat.txt"))
+from io import StringIO
 
 def unique(messages):
     uniques = []
@@ -23,9 +14,7 @@ def unique(messages):
                 flag = 1
         if flag == 0:
             uniques.append(member_name)
-    return uniques    
-                
-members = unique(messages)
+    return uniques
 
 def message_amounts(messages, members):
     msg_amounts = {}
@@ -37,11 +26,32 @@ def message_amounts(messages, members):
         msg_amounts.update({i : c})
     return msg_amounts
 
-amounts = message_amounts(messages, members)
+st.title("WhatsApp Chat Analyzer")
+st.write("""
 
-df = pd.DataFrame({
-    'first column': amounts.keys(),
-    'second column': amounts.values()
-})
+WhatsApp Chat Analysis
 
-st.write(df)
+
+""")
+
+uploaded_file = st.file_uploader("Choose a file")
+if uploaded_file is not None:
+
+    bytes_data = uploaded_file.getvalue()
+
+    stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
+
+    string_data = stringio.read()
+
+    messages = json.loads(wapp_to_json(string_data))
+                    
+    members = unique(messages)
+
+    amounts = message_amounts(messages, members)
+
+    df = pd.DataFrame({
+        'first column': amounts.keys(),
+        'second column': amounts.values()
+    })
+        
+    st.write(df)
