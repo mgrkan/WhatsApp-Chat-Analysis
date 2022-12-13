@@ -31,7 +31,8 @@ def wapp_to_json(chat_location):
         flag = 1
         for i in ["changed this group", "left", "added",
         "joined using this group's invite link", "removed", "can message this group",
-        "ERROR", "changed the subject", "changed the group"]:
+        "ERROR", "changed the subject", "changed the group", "Messages and calls are end-to-end encrypted",
+        "created group", "You're now", "started a call"]:
             if i in msg_dict["Sender"]:
                 flag = 0
         if flag == 1:
