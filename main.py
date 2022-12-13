@@ -3,6 +3,7 @@ import json
 import streamlit as st
 import pandas as pd
 from io import StringIO
+import altair as alt
 
 def unique(messages):
     uniques = []
@@ -26,11 +27,27 @@ def message_amounts(messages, members):
         msg_amounts.update({i : c})
     return msg_amounts
 
+def month_list(messages, members):
+    month_list = {}
+    for i in members:
+        c = 0
+        for x in messages:
+            if x["Month"] == str(i):
+                c += 1
+        month_list.update({i : c})
+    return month_list
+
+
+st.set_page_config(
+    page_title="WhatsApp Chat Analyzer",
+    page_icon="random"
+)
+
 st.title("WhatsApp Chat Analyzer")
 st.write("""
 
-WhatsApp Chat Analysis
-
+WhatsApp Chat Analysis\n
+Choose a WhatsApp export below 👇
 
 """)
 
@@ -38,20 +55,39 @@ uploaded_file = st.file_uploader("Choose a file")
 if uploaded_file is not None:
 
     bytes_data = uploaded_file.getvalue()
-
     stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
-
     string_data = stringio.read()
 
     messages = json.loads(wapp_to_json(string_data))
-                    
     members = unique(messages)
-
     amounts = message_amounts(messages, members)
+    
+    #sorted_dict = sorted(amounts.items(), key=lambda x:x[1])
+    #sorted_dict = dict(sorted_dict)
+    #print(sorted_dict)
 
-    df = pd.DataFrame({
-        'first column': amounts.keys(),
-        'second column': amounts.values()
-    })
-        
-    st.write(df)
+    months = month_list(messages, range(1,13))
+    
+    df = pd.DataFrame(amounts.values(), index=amounts.keys(),
+    columns=["Members"] )
+
+    mdf = pd.DataFrame(months.values(), index=[
+        "1 January", "2 February", "3 March", "4 April", "5 May", "6 June", "7 July", "8 August", "9 September", "91 October", "92 November", "93 December"
+    ])
+    #madf = pd.DataFrame({"Messages":months.values(), 
+    #"Month":["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]})
+
+    progress = st.progress(0)
+    for i in range(100):
+        progress.progress(i + 1)
+
+    st.write("""Members""")
+    st.bar_chart(df, height=500)
+    
+    #st.write(alt.Chart(madf).mark_bar().encode(
+    #    x=alt.X('Month', sort=None),
+    #    y='Messages',
+    #))
+
+    st.write("""Months""")
+    st.bar_chart(mdf, height=500)
