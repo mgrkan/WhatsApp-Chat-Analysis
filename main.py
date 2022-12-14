@@ -3,7 +3,7 @@ import json
 import streamlit as st
 import pandas as pd
 from io import StringIO
-import altair as alt
+import plotly.express as px
 
 def unique(messages):
     uniques = []
@@ -70,24 +70,18 @@ if uploaded_file is not None:
     
     df = pd.DataFrame(amounts.values(), index=amounts.keys(),
     columns=["Members"] )
-
-    mdf = pd.DataFrame(months.values(), index=[
-        "1 January", "2 February", "3 March", "4 April", "5 May", "6 June", "7 July", "8 August", "9 September", "91 October", "92 November", "93 December"
+    
+    monthsdf = pd.DataFrame(months.values(), index=[
+        "0.1 January", "0.2 February", "0.3 March", "0.4 April", "0.5 May", "0.6 June", "0.7 July", "0.8 August", "0.9 September", "1.0 October", "1.1 November", "1.2 December"
     ])
-    #madf = pd.DataFrame({"Messages":months.values(), 
-    #"Month":["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]})
-
+    
     progress = st.progress(0)
     for i in range(100):
         progress.progress(i + 1)
 
     st.write("""Members""")
     st.bar_chart(df, height=500)
-    
-    #st.write(alt.Chart(madf).mark_bar().encode(
-    #    x=alt.X('Month', sort=None),
-    #    y='Messages',
-    #))
+    st.write(px.pie(values=amounts.values(), names=amounts.keys(), title="Pie Chart of messages per members"))
 
     st.write("""Months""")
-    st.bar_chart(mdf, height=500)
+    st.bar_chart(monthsdf, height=500)
