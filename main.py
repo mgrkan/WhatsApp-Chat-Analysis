@@ -4,7 +4,7 @@ import streamlit as st
 import pandas as pd
 from io import StringIO
 import plotly.express as px
-from math import floor
+#from math import floor
 
 def unique(messages):
     uniques = []
@@ -55,7 +55,7 @@ def fwma(wpm, words): #Message amounts recalculation according to average wpm
     average_wpm = sum / len(wpm)
     for i in words.keys():
         fwma = words[i] / average_wpm
-        fwma = floor(fwma)
+        #fwma = floor(fwma)
         fwma_dict.update({i : fwma})
     return fwma_dict
     
