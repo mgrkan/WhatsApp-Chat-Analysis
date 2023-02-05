@@ -149,12 +149,27 @@ if uploaded_file is not None:
     st.write("""Message amount recalculation with the average wpm ({})""".format(average_wpm))
     st.bar_chart(fwmadf, height=500)
     st.write(px.pie(values=amounts.values(), names=amounts.keys(), title="Pie Chart of messages per members"))
+    st.write("""Most used words of the chat""")
+    muw = most_used_word(messages)
+    top_ten = muw[0]
+    last_ten = len(top_ten) - 10
+    top_ten = top_ten[last_ten:]
+    df = pd.DataFrame([i[1] for i in top_ten], index=[i[0] for i in top_ten], columns=["Words"])
+    st.bar_chart(df, height=500)
+    muwp = {} #shares of the most used word usage
+    for i in members:
+        msgs = usr_messages(i, messages)
+        for x in most_used_word(msgs)[0]:
+            if x[0] == muw[1][0]:
+                 muwp.update({i:x[1]})
+                 continue
+    st.write(px.pie(values=muwp.values(), names=muwp.keys(), title=("""Pie Chart of the word '{}' usage. (Most used word of the group)""".format(muw[1][0]))))
     
     
     for i in members:
         msgs = usr_messages(i, messages)
-        last_ten = len(most_used_word(msgs)[0]) - 10
         top_ten = most_used_word(msgs)[0]
+        last_ten = len(top_ten) - 10
         top_ten = top_ten[last_ten:]
         df = pd.DataFrame([i[1] for i in top_ten], index=[i[0] for i in top_ten], columns=["Words"])
         st.write("""{}'s top ten most used words""".format(i))
