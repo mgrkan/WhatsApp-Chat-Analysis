@@ -69,6 +69,28 @@ def month_list(messages, members):
         month_list.update({i : c})
     return month_list
 
+def usr_messages(name, messages):
+    user_msg = []
+    for i in messages:
+        if i["Sender"] == name:
+            user_msg.append(i)
+    return user_msg
+
+def most_used_word(messages):
+    word_list = {}
+    for i in messages:
+        words = i["Message"].split()
+        for x in words:
+            try:
+                q = word_list[x]
+                word_list.update({x : q + 1 })
+            except:
+                word_list.update({x : 1})
+
+    sorted_word_list = sorted(word_list.items(), key=lambda x:x[1])
+    muw = sorted_word_list[-1]
+    return [sorted_word_list, muw]
+
 
 st.set_page_config(
     page_title="WhatsApp Chat Analyzer",
@@ -101,7 +123,7 @@ if uploaded_file is not None:
     #sorted_dict = dict(sorted_dict)
     #print(sorted_dict)
 
-    months = month_list(messages, range(1,13))
+#    months = month_list(messages, range(1,13))
     
     df = pd.DataFrame(amounts.values(), index=amounts.keys(),
     columns=["Members"] )
@@ -110,9 +132,9 @@ if uploaded_file is not None:
     wpmdf = pd.DataFrame(wpmsg.values(), index=wpmsg.keys(), columns=["Members"] )
     fwmadf = pd.DataFrame(fwma.values(), index=fwma.keys(), columns=["Members"] )
     
-    monthsdf = pd.DataFrame(months.values(), index=[
-        "0.1 January", "0.2 February", "0.3 March", "0.4 April", "0.5 May", "0.6 June", "0.7 July", "0.8 August", "0.9 September", "1.0 October", "1.1 November", "1.2 December"
-    ])
+#    monthsdf = pd.DataFrame(months.values(), index=[
+#        "0.1 January", "0.2 February", "0.3 March", "0.4 April", "0.5 May", "0.6 June", "0.7 July", "0.8 August", "0.9 September", "1.0 October", "1.1 November", "1.2 December"
+#    ])
     
     progress = st.progress(0)
     for i in range(100):
@@ -127,6 +149,16 @@ if uploaded_file is not None:
     st.write("""Message amount recalculation with the average wpm ({})""".format(average_wpm))
     st.bar_chart(fwmadf, height=500)
     st.write(px.pie(values=amounts.values(), names=amounts.keys(), title="Pie Chart of messages per members"))
-
-    st.write("""Months""")
-    st.bar_chart(monthsdf, height=500)
+    
+    
+    for i in members:
+        msgs = usr_messages(i, messages)
+        last_ten = len(most_used_word(msgs)[0]) - 10
+        top_ten = most_used_word(msgs)[0]
+        top_ten = top_ten[last_ten:]
+        df = pd.DataFrame([i[1] for i in top_ten], index=[i[0] for i in top_ten], columns=["Words"])
+        st.write("""{}'s top ten most used words""".format(i))
+        st.bar_chart(df, height=500)
+    
+#    st.write("""Months""")
+#    st.bar_chart(monthsdf, height=500)
